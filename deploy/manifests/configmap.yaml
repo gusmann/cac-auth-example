@@ -1,0 +1,56 @@
+apiVersion: v1
+data:
+  requirements.txt: |
+    flask
+    cryptography
+    flask-appbuilder[openid]
+  server.py: |
+    from flask import Flask, jsonify, request
+    from logging.config import dictConfig
+
+    dictConfig({
+        'version': 1,
+        'formatters': {'default': {
+            'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+        }},
+        'handlers': {'wsgi': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',  # <-- Solution
+            'formatter': 'default'
+        }},
+        'root': {
+            'level': 'INFO',
+            'handlers': ['wsgi']
+        }
+    })
+    app = Flask(__name__)    
+    @app.route('/', defaults={'path': ''}, methods = ['GET', 'POST', 'DELETE'])
+    @app.route('/<path:path>',methods = ['GET', 'POST', 'DELETE'])
+    def default(path):
+        app.logger.info(f"Path: {path}")
+        result = {}
+        app.logger.info(f"receieved {len(request.headers)} headers")
+        for h in request.headers:
+            # app.logger.info(f"{len(h)} - {len(h[0])} - {len(h[1])}")
+            result[h[0]] = h[1]
+        app.logger.info(f"headers: {str(result)}")
+        if request.method == 'POST':
+          app.logger.info(f"post form: {request.form}")
+          try:
+            d = request.get_json(force=True)
+            app.logger.info(f"post json: {d}")
+          except Exception as e:
+            app.logger.exception(f"unable to deserialize json")
+            d = request.form.to_dict()
+          data = {}
+          for k in d:
+            data[k] = d[k]
+          result['data'] = data
+        return result
+
+    if __name__ == "__main__":
+        app.run(host="0.0.0.0", port=5000)# , ssl_context='adhoc')
+kind: ConfigMap
+metadata:
+  name: flask-config
+  namespace: flask

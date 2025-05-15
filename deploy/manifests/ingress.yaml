@@ -1,0 +1,25 @@
+# kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    name: flask
+  name: nginx-flask
+  namespace: flask
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: flask.local.403labs.io
+      http:
+        paths:
+          - backend:
+              service:
+                name: flask
+                port:
+                  name: flask
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - flask.local.403labs.io
+      secretName: flask-ingress
