@@ -2,6 +2,14 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-tls-error-page: https://www.google.com/404
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: 'true'
+    nginx.ingress.kubernetes.io/auth-tls-secret: flask/dod-ca-bundle
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: optional
+    nginx.ingress.kubernetes.io/auth-tls-verify-depth: '1'
+    nginx.ingress.kubernetes.io/forwarded-for-header: X-Forwarded-For
+    nginx.ingress.kubernetes.io/use-proxy-protocol: 'true'
   labels:
     name: flask
   name: nginx-flask
