@@ -3,12 +3,34 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    nginx.ingress.kubernetes.io/auth-tls-error-page: https://www.google.com/404
-    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: 'true'
-    nginx.ingress.kubernetes.io/auth-tls-secret: flask/dod-ca-bundle
+    # Enable client certificate verification
     nginx.ingress.kubernetes.io/auth-tls-verify-client: optional
+
+    # Pass the client's SSL certificate to the upstream server.
+    # This will add the X-SSL-Client-Cert header containing the URL-encoded PEM client certificate.
+    # It also makes the $ssl_client_* NGINX variables available for use in snippets.
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: 'true'
+
+    # Secret containing the CA certificate(s) to verify client certificates against.
+    # This secret must be in the same namespace as the Ingress or defined globally by the controller.
+    # The secret should contain a key named 'ca.crt' with the PEM-encoded CA certificate(s).
+    nginx.ingress.kubernetes.io/auth-tls-secret: flask/dod-ca-bundle
+
+    # Optional: Specify the verification depth in the client certificate chain.
     nginx.ingress.kubernetes.io/auth-tls-verify-depth: '1'
-    nginx.ingress.kubernetes.io/forwarded-for-header: X-Forwarded-For
+
+    # Optional: Specify a custom error page URL if authentication fails.
+    nginx.ingress.kubernetes.io/auth-tls-error-page: https://www.google.com/404
+
+    # Used to configure how NGINX handles the X-Forwarded-For HTTP header. 
+    # The X-Forwarded-For header is a standard way for identifying the originating IP address of a 
+    # client connecting to a web server through an HTTP proxy or a load balancer.
+    # When traffic passes through multiple proxies, each proxy can append the IP address 
+    # of the client it received the request from to the X-Forwarded-For header.
+    nginx.ingress.kubernetes.io/forwarded-for-header: 'X-Forwarded-For'
+
+    # Enables the PROXY protocol for connections between the load balancer (that sits in front of NGINX 
+    # Ingress, e.g., an AWS ELB, Google Cloud Load Balancer) and the NGINX Ingress controller pods.
     nginx.ingress.kubernetes.io/use-proxy-protocol: 'true'
   labels:
     name: flask

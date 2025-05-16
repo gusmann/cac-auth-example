@@ -2,13 +2,15 @@
 
 ## What is this?
 
-The manifests in [./deploy/manifests](./deploy/manifests/) can be applied/installed into a local kubernetes cluster to configure a flask application that simply displays the headers that a client sends it; since we also define an Nginx Ingress and a few other resources that enable us to perform mutual TLS (mTLS).
-
-In some environments, such as the DoD, individuals are issued client certificates on Yubikeys or other hardware security modules (HSMs), such as a Smartcard. In the DoD, these smartcards are also known as Common Access Cards (CACs).
-
-We can leverage a user's client certificates to perform a simple authentication/validation check at the Ingress then forward the user's client certificate attributes to a destination application to perform additional authentication/authorization tasks.
+The manifests in [./deploy/manifests](./deploy/manifests/) can be applied/installed into a local kubernetes cluster to configure a flask application that simply displays the headers that a client sends it; we also define an Nginx Ingress and a few other resources that enable us to perform mutual TLS (mTLS).
 
 Simply put, the manifests in this repository allows us to view these attributes so we know what they look like.
+
+### Why?
+
+Some organizations, such as the DoD, leverage Public Key Infrastructure (PKI) to enable secure two-factor authentication across information technology environments. Individuals are issued client certificates via Yubikeys or other hardware security modules (HSMs), such as a Smartcard by trusted agents which validate the user's identity. In the DoD, smartcards are also known as Common Access Cards (CACs).
+
+We can leverage a user's client certificates to perform a simple authentication/validation check at the Ingress then forward the user's client certificate attributes to a destination application to perform additional authentication/authorization tasks.
 
 ## How to use
 
